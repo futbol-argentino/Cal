@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es" data-th="dark" data-ac="lime">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mi registro deportivo</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0f11;--c:#17191c;--c2:#1f2226;--ln:#2a2e33;--tx:#eceff1;--mu:#8b939b;--ac:#c6f432;--on:#0e0f11;--bad:#ff6b6b;--r:14px}
+[data-ac=sky]{--ac:#4cc9f0}
+[data-th=light]{--bg:#f2f4f6;--c:#fff;--c2:#eef1f3;--ln:#dde1e5;--tx:#15181b;--mu:#66707a;--ac:#4d7c0f;--on:#fff}
+[data-th=light][data-ac=sky]{--ac:#0284c7}
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.45 Barlow,system-ui,sans-serif;background:var(--bg);color:var(--tx)}
+#app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+#nav{position:sticky;top:0;height:100vh;padding:20px 12px;border-right:1px solid var(--ln);display:flex;flex-direction:column;gap:4px}
+.brand{font:700 22px 'Barlow Condensed';padding:0 10px 16px;color:var(--ac)}
+#nav a{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:10px;color:var(--mu);text-decoration:none;white-space:nowrap}
+#nav a.on{background:var(--c2);color:var(--tx)}
+main{padding:24px;max-width:1100px;width:100%}
+h1{font:700 34px 'Barlow Condensed';margin:0}h2{font:600 18px Barlow;margin:0 0 10px}
+.hd{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.g{display:grid;gap:14px;margin-bottom:14px}.g4{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.card{background:var(--c);border:1px solid var(--ln);border-radius:var(--r);padding:16px}
+.big{font:700 38px/1.05 'Barlow Condensed'}.mu{color:var(--mu)}.ac{color:var(--ac)}
+.btn{background:var(--ac);color:var(--on);border:0;border-radius:10px;padding:10px 16px;font:600 15px Barlow;cursor:pointer}
+.btn.s{background:var(--c2);color:var(--tx);border:1px solid var(--ln)}.btn.d{background:var(--bad);color:#fff}.btn.sm{padding:5px 10px;font-size:13px}
+input,select,textarea{width:100%;background:var(--c2);color:var(--tx);border:1px solid var(--ln);border-radius:10px;padding:10px;font:16px Barlow}
+input[type=checkbox]{width:auto}
+label{display:block;font-size:13px;color:var(--mu);margin-bottom:10px}label input,label select,label textarea{margin-top:4px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.bar{height:8px;background:var(--c2);border-radius:99px;overflow:hidden;margin:6px 0}.bar i{display:block;height:100%;background:var(--ac)}
+.row{display:flex;gap:12px;align-items:center;padding:10px;border-radius:12px;cursor:pointer}.row:hover{background:var(--c2)}
+.ic{font-size:24px;width:34px;text-align:center}.grow{flex:1;min-width:0}.rt{text-align:right}
+.tb{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.tb>*{flex:1 1 140px;width:auto}
+table{width:100%;border-collapse:collapse}td,th{padding:6px 4px;text-align:left;border-bottom:1px solid var(--ln)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.cal div{min-height:54px;border-radius:8px;background:var(--c2);font-size:12px;padding:4px;cursor:pointer}
+.cal .h{background:none;min-height:0;text-align:center;color:var(--mu);cursor:default}.cal .on{background:color-mix(in srgb,var(--ac) 28%,var(--c2))}.cal .sel{outline:2px solid var(--ac)}.cal small{display:block;color:var(--mu);font-size:10px}
+.tag{font-size:12px;border:1px solid var(--ln);border-radius:99px;padding:1px 8px;color:var(--mu)}
+.bd{text-align:center}.bd .ic{font-size:34px;width:auto}.bd.off{opacity:.35;filter:grayscale(1)}
+#modal{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;z-index:50;padding:12px}#modal.on{display:flex}
+.box{background:var(--c);border:1px solid var(--ln);border-radius:16px;padding:20px;max-width:520px;width:100%;max-height:90vh;overflow:auto}
+#toasts{position:fixed;right:14px;top:14px;z-index:60;display:grid;gap:8px;max-width:340px}
+.toast{background:var(--c2);border:1px solid var(--ln);border-left:4px solid var(--ac);border-radius:12px;padding:12px 14px;animation:pop .35s}.toast.err{border-left-color:var(--bad)}.toast.rec{border-color:var(--ac)}
+@keyframes pop{from{transform:translateY(-8px) scale(.96);opacity:0}}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media(max-width:800px){#app{display:block}#nav{position:fixed;bottom:0;left:0;right:0;top:auto;height:auto;flex-direction:row;overflow-x:auto;padding:6px;border:0;border-top:1px solid var(--ln);background:var(--c);z-index:20}.brand{display:none}#nav a{flex-direction:column;gap:0;font-size:11px;padding:6px 10px}main{padding:16px 14px 90px}.fr{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div id="app"><nav id="nav"></nav><main id="main"></main></div>
+<div id="modal"></div><div id="toasts"></div>
+<script>
+'use strict';
+/* ===== Utilidades ===== */
+const $=(s,e=document)=>e.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const U={km:{f:1,d:'km',s:'km/h',p:'min/km'},mi:{f:.621371,d:'mi',s:'mph',p:'min/mi'}};
+const MES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const DIAS=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+const DEF_T=[['caminata','Caminata','🚶','walk',1],['caminata-rapida','Caminata rápida','🚶‍♂️','walk',1],['running','Running','🏃','run',1],['bicicleta','Bicicleta','🚴','bike',1],['bici-fija','Bicicleta fija','🚲','fija',1],['gimnasio','Gimnasio','🏋️','gym',0],['fuerza','Entrenamiento de fuerza','💪','gym',0],['futbol','Fútbol','⚽','otro',1],['natacion','Natación','🏊','otro',1],['senderismo','Senderismo','🥾','walk',1],['otro','Otro','✨','otro',1]].map(([id,n,i,c,d])=>({id,n,i,c,d}));
+let S={acts:[],cfg:{unit:'km',th:'dark',ac:'lime',types:DEF_T,df:{}},goals:[],ach:{b:{},g:{},rec:0}};
+let UI={h:{p:'all',t:'all',s:'d-',q:'',v:'list',from:'',to:''},s:{p:'all',t:'all',m:'dist',a:'',b:''},cal:null,sel:null,ch:'dist',edit:null};
+const un=()=>U[S.cfg.unit],n=(x,d=1)=>Number(x).toLocaleString('es-AR',{maximumFractionDigits:d});
+const D=k=>k==null?'—':n(k*un().f,2)+' '+un().d,SP=k=>k==null?'—':n(k*un().f)+' '+un().s;
+const H=m=>{const t=Math.round(m);return t>=60?Math.floor(t/60)+' h '+String(t%60).padStart(2,'0')+' min':t+' min'},HR=m=>n(m/60,1)+' h';
+const PC=p=>{if(p==null)return'—';p/=un().f;let m=Math.floor(p),s=Math.round((p-m)*60);if(s===60){m++;s=0}return m+':'+String(s).padStart(2,'0')+' '+un().p};
+const pace=a=>a.dist>0&&a.dur>0?a.dur/a.dist:null,spd=a=>a.dist>0&&a.dur>0?a.dist/(a.dur/60):null;
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const parse=s=>new Date(s+'T00:00:00'),addD=(s,k)=>{const d=parse(s);d.setDate(d.getDate()+k);return iso(d)},today=()=>iso(new Date());
+const wk=s=>addD(s,-((parse(s).getDay()+6)%7)),mo=s=>s.slice(0,7),yr=s=>s.slice(0,4),fd=s=>s.split('-').reverse().join('/');
+const moAdd=(k,d)=>{let[y,m]=k.split('-').map(Number);m+=d;y+=Math.floor((m-1)/12);m=((m-1)%12+12)%12+1;return y+'-'+String(m).padStart(2,'0')};
+const T=id=>S.cfg.types.find(t=>t.id===id)||{n:'(tipo eliminado)',i:'❔',c:'otro',d:1};
+const uid=()=>crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2);
+const sum=l=>({n:l.length,dist:l.reduce((s,x)=>s+(x.dist||0),0),dur:l.reduce((s,x)=>s+x.dur,0),cal:l.reduce((s,x)=>s+(x.cal||0),0),days:new Set(l.map(x=>x.date)).size});
+const grp=(a,kf)=>{const m=new Map();a.forEach(x=>{const k=kf(x.date);(m.get(k)||m.set(k,[]).get(k)).push(x)});return[...m].map(([k,l])=>({k,...sum(l)}))};
+const streaks=a=>{const ds=[...new Set(a.map(x=>x.date))].sort(),o=[];let l=0;ds.forEach((d,i)=>{l=i&&addD(ds[i-1],1)===d?l+1:1;if(i===ds.length-1||addD(d,1)!==ds[i+1])o.push({v:l,d})});return o};
+const curStreak=a=>{const ds=new Set(a.map(x=>x.date));let d=today(),c=0;if(!ds.has(d))d=addD(d,-1);while(ds.has(d)){c++;d=addD(d,-1)}return c};
+function toast(m,c=''){const e=document.createElement('div');e.className='toast '+c;e.textContent=m;$('#toasts').append(e);setTimeout(()=>e.remove(),c==='rec'?7000:5000)}
+
+/* ===== Almacenamiento (IndexedDB) ===== */
+const DB={db:null,
+ open(){return new Promise((ok,ko)=>{const r=indexedDB.open('actividad-fisica',1);r.onupgradeneeded=()=>{r.result.createObjectStore('acts',{keyPath:'id'});r.result.createObjectStore('kv')};r.onsuccess=()=>{this.db=r.result;ok()};r.onerror=()=>ko(r.error)})},
+ tx(s,m,f){return new Promise((ok,ko)=>{const t=this.db.transaction(s,m),r=f(t.objectStore(s));t.oncomplete=()=>ok(r&&r.result);t.onerror=t.onabort=()=>ko(t.error)})},
+ all(){return this.tx('acts','readonly',s=>s.getAll())},put(a){return this.tx('acts','readwrite',s=>s.put(a))},del(id){return this.tx('acts','readwrite',s=>s.delete(id))},clear(){return this.tx('acts','readwrite',s=>s.clear())},
+ get(k){return this.tx('kv','readonly',s=>s.get(k))},set(k,v){return this.tx('kv','readwrite',s=>s.put(v,k))}};
+const saveCfg=()=>DB.set('cfg',S.cfg),saveGoals=()=>DB.set('goals',S.goals),saveAch=()=>DB.set('ach',S.ach);
+
+/* ===== Objetivos ===== */
+const MN={dist:'Distancia',dur:'Horas de actividad',n:'Cantidad de actividades',cal:'Calorías registradas',days:'Días activos'};
+const GN=g=>MN[g.m]+(g.p==='w'?' semanal':' mensual');
+const gv=(g,k,a=S.acts)=>{const s=sum(a.filter(x=>(g.p==='w'?wk(x.date):mo(x.date))===k&&(g.ty==='all'||x.type===g.ty)));return{dist:s.dist,dur:s.dur/60,n:s.n,cal:s.cal,days:s.days}[g.m]};
+const gk=g=>g.p==='w'?wk(today()):mo(today());
+const gf=(g,x)=>g.m==='dist'?D(x):g.m==='dur'?n(x,1)+' h':g.m==='cal'?n(x,0)+' kcal':n(x,0)+(g.m==='days'?' días':' act.');
+function metRuns(a,pk){const gs=S.goals.filter(g=>g.p===pk);if(!gs.length||!a.length)return[];const key=pk==='w'?wk:mo,cur=key(today()),step=k=>pk==='w'?addD(k,7):moAdd(k,1);let k=key(gs.map(g=>g.c).sort()[0]),o=[],l=0,last;
+ for(;k<cur;k=step(k)){const ap=gs.filter(g=>key(g.c)<=k);if(ap.length&&ap.every(g=>gv(g,k,a)>=g.t)){l++;last=k}else{if(l)o.push({v:l,d:last});l=0}}
+ if(l)o.push({v:l,d:last});return o}
+
+/* ===== Récords ===== */
+const bc=c=>a=>a.filter(x=>T(x.type).c===c),ID=d=>d;
+const one=(f,flt)=>a=>(flt?flt(a):a).map(x=>({v:f(x),d:x.date})).filter(c=>c.v>0);
+const agg=(kf,f)=>a=>grp(a,kf).map(g=>({v:f(g),d:g.k})).filter(c=>c.v>0);
+const cnt=(u,v)=>v=>n(v,0)+' '+u;
+const REC=[
+['Distancia','Mayor distancia en una actividad',one(x=>x.dist),D,'a'],['Distancia','Mayor distancia en bicicleta (una salida)',one(x=>x.dist,bc('bike')),D,'a'],
+['Distancia','Mayor distancia corriendo (una sesión)',one(x=>x.dist,bc('run')),D,'a'],['Distancia','Mayor distancia caminando (una sesión)',one(x=>x.dist,bc('walk')),D,'a'],
+['Distancia','Mayor distancia acumulada en un día',agg(ID,g=>g.dist),D,'d'],['Distancia','Mayor distancia acumulada en una semana',agg(wk,g=>g.dist),D,'w'],
+['Distancia','Mayor distancia acumulada en un mes',agg(mo,g=>g.dist),D,'m'],['Distancia','Mayor distancia acumulada en un año',agg(yr,g=>g.dist),D,'y'],
+['Duración','Actividad individual de mayor duración',one(x=>x.dur),H,'a'],['Duración','Más horas de actividad en un día',agg(ID,g=>g.dur),HR,'d'],
+['Duración','Más horas de actividad en una semana',agg(wk,g=>g.dur),HR,'w'],['Duración','Más horas de actividad en un mes',agg(mo,g=>g.dur),HR,'m'],
+['Rendimiento','Mayor velocidad media en bicicleta',one(spd,bc('bike')),SP,'a'],['Rendimiento','Mayor velocidad media corriendo',one(spd,bc('run')),SP,'a'],
+['Rendimiento','Mejor ritmo por kilómetro corriendo',one(pace,bc('run')),PC,'a',1],['Rendimiento','Más calorías registradas en una actividad',one(x=>x.cal||0),v=>n(v,0)+' kcal','a'],
+['Rendimiento','Más calorías registradas en un día',agg(ID,g=>g.cal),v=>n(v,0)+' kcal','d'],
+['Constancia','Más días consecutivos con actividad',streaks,cnt('días'),'a'],['Constancia','Más actividades en una semana',agg(wk,g=>g.n),cnt('actividades'),'w'],
+['Constancia','Más días activos en un mes',agg(mo,g=>g.days),cnt('días'),'m'],['Constancia','Más semanas consecutivas cumpliendo mis objetivos',a=>metRuns(a,'w'),cnt('semanas'),'a'],
+['Constancia','Más meses consecutivos cumpliendo mis objetivos',a=>metRuns(a,'m'),cnt('meses'),'a']
+].map(([sec,l,f,fm,pk,low])=>({sec,l,f,fm,pk,low}));
+const PL=(k,pk)=>pk==='w'?'Semana del '+fd(k):pk==='m'?k.slice(5)+'/'+k.slice(0,4):pk==='y'?k:fd(k);
+function records(a){return REC.map(r=>{const c=r.f(a);if(!c.length)return{...r,none:1};const bt=(x,y)=>r.low?x<y:x>y;let b=c[0];c.forEach(x=>{if(bt(x.v,b.v)||(x.v===b.v&&x.d<b.d))b=x});let p=null;c.filter(x=>x.d<b.d).forEach(x=>{if(!p||bt(x.v,p.v))p=x});return{...r,v:b.v,d:b.d,prev:p}})}
+
+/* ===== Insignias y niveles ===== */
+const BADGES=[['f','🌱','Primer entrenamiento','Registrá tu primera actividad',c=>c.N>=1],['w','📅','Primera semana activa','Actividad durante 7 días seguidos',c=>c.st>=7],
+['k1','🛣️','100 km','100 km acumulados',c=>c.km>=100],['k5','🌄','500 km','500 km acumulados',c=>c.km>=500],['k10','🌍','1.000 km','1.000 km acumulados',c=>c.km>=1000],
+['n10','🔟','10 actividades','10 actividades registradas',c=>c.N>=10],['n50','⭐','50 actividades','50 actividades registradas',c=>c.N>=50],['n100','💯','100 actividades','100 actividades registradas',c=>c.N>=100],
+['m','🗓️','Mes completo','Un mes cerrado cumpliendo todos tus objetivos mensuales',c=>c.mr>=1],['r','🏆','Récord superado','Superá un récord personal',c=>c.rec>0]].map(([id,i,n,d,f])=>({id,i,n,d,f}));
+const xp=()=>S.acts.length*10+Math.floor(sum(S.acts).dist)+Object.keys(S.ach.b).length*50;
+async function check(dates=[today()]){const ev=[];
+ S.goals.forEach(g=>new Set(dates.filter(Boolean).map(d=>g.p==='w'?wk(d):mo(d))).forEach(k=>{const id=g.id+'|'+k;if(gv(g,k)>=g.t&&!S.ach.g[id]){S.ach.g[id]={nm:g.nm||GN(g),k,p:g.p,d:today()};ev.push('🎯 Objetivo cumplido: '+(g.nm||GN(g)))}}));
+ const c={km:sum(S.acts).dist,N:S.acts.length,st:Math.max(0,...streaks(S.acts).map(x=>x.v)),mr:metRuns(S.acts,'m').length,rec:S.ach.rec};
+ BADGES.forEach(b=>{if(!S.ach.b[b.id]&&b.f(c)){S.ach.b[b.id]=today();ev.push(b.i+' Nueva insignia: '+b.n)}});
+ await saveAch();return ev}
+
+/* ===== Gráficos (SVG propio) ===== */
+const NOD='<p class="mu">Sin datos suficientes para este gráfico.</p>';
+const bars=(it,fm=n)=>{if(!it.some(x=>x.v>0))return NOD;const W=600,Hh=150,m=Math.max(...it.map(x=>x.v)),bw=W/it.length;
+ return`<svg viewBox="0 0 ${W} ${Hh+24}" style="width:100%">${it.map((x,i)=>{const h=x.v/m*(Hh-16),cx=i*bw+bw/2;return`<rect x="${i*bw+4}" y="${Hh-h}" width="${bw-8}" height="${x.v>0?Math.max(h,2):0}" rx="4" fill="var(--ac)"><title>${esc(x.l)}: ${fm(x.v)}</title></rect>${x.v?`<text x="${cx}" y="${Hh-h-4}" font-size="10" text-anchor="middle" fill="var(--mu)">${fm(x.v)}</text>`:''}<text x="${cx}" y="${Hh+15}" font-size="10" text-anchor="middle" fill="var(--mu)">${esc(x.l)}</text>`}).join('')}</svg>`};
+const hbars=(it,fm=v=>n(v,0))=>it.some(x=>x.v>0)?`<div>${it.map(x=>{const m=Math.max(...it.map(y=>y.v));return`<div style="display:flex;gap:8px;align-items:center"><span style="width:130px;font-size:13px">${esc(x.l)}</span><div class="bar grow"><i style="width:${x.v/m*100}%"></i></div><b style="width:60px;text-align:right">${fm(x.v)}</b></div>`}).join('')}</div>`:NOD;
+const line=(p,fm)=>{if(p.length<2)return'<p class="mu">Hacen falta al menos 2 marcas para mostrar la evolución.</p>';const W=600,Hh=150,mx=Math.max(...p.map(x=>x.v)),mn=Math.min(...p.map(x=>x.v)),X=i=>20+i*(W-40)/(p.length-1),Y=v=>Hh-10-(mx===mn?.5:(v-mn)/(mx-mn))*(Hh-30);
+ return`<svg viewBox="0 0 ${W} ${Hh+20}" style="width:100%"><polyline fill="none" stroke="var(--ac)" stroke-width="2.5" points="${p.map((x,i)=>X(i)+','+Y(x.v)).join(' ')}"/>${p.map((x,i)=>`<circle cx="${X(i)}" cy="${Y(x.v)}" r="4" fill="var(--ac)"><title>${x.l}: ${fm(x.v)}</title></circle>`).join('')}<text x="20" y="${Hh+14}" font-size="10" fill="var(--mu)">${p[0].l}</text><text x="${W-20}" y="${Hh+14}" font-size="10" text-anchor="end" fill="var(--mu)">${p[p.length-1].l}</text><text x="${W-20}" y="12" font-size="11" text-anchor="end" fill="var(--mu)">Mejor: ${fm(mx)}</text></svg>`};
+const MT={dist:['Distancia',g=>g.dist*un().f,v=>n(v,1)],dur:['Horas',g=>g.dur/60,v=>n(v,1)],cal:['Calorías',g=>g.cal,v=>n(v,0)],n:['Actividades',g=>g.n,v=>n(v,0)]};
+const series=(a,pk,c,m)=>{const gs=new Map(grp(a,pk==='w'?wk:mo).map(g=>[g.k,g]));let k=pk==='w'?wk(today()):mo(today()),ks=[];for(let i=0;i<c;i++){ks.unshift(k);k=pk==='w'?addD(k,-7):moAdd(k,-1)}return ks.map(k=>({l:pk==='w'?k.slice(8)+'/'+k.slice(5,7):k.slice(5)+'/'+k.slice(2,4),v:gs.has(k)?MT[m][1](gs.get(k)):0}))};
+
+/* ===== Componentes ===== */
+const pv=x=>{const c=T(x.type).c;return c==='walk'?PC(pace(x)):c==='run'?PC(pace(x))+', '+SP(spd(x)):x.dist>0?SP(spd(x)):''};
+const row=x=>{const t=T(x.type);return`<div class="row" data-a="det" data-id="${x.id}"><span class="ic">${t.i}</span><div class="grow"><b>${esc(t.n)}</b><div class="mu">${fd(x.date)}${x.start?', '+x.start:''}</div></div><div class="rt"><b>${H(x.dur)}</b><div class="mu">${[x.dist>0?D(x.dist):'',pv(x).replace(/^—$/,''),x.cal!=null?n(x.cal,0)+' kcal est.':''].filter(Boolean).join(', ')}</div></div></div>`};
+const gcard=(g,ed)=>{const k=gk(g),v=gv(g,k),pc=Math.min(100,v/g.t*100),st=v>=g.t?'Cumplido':v>0?'En progreso':'Pendiente',cur=parse(today()),left=g.p==='w'?6-((cur.getDay()+6)%7):new Date(cur.getFullYear(),cur.getMonth()+1,0).getDate()-cur.getDate();
+ return`<div class="card"><div style="display:flex;justify-content:space-between;gap:8px"><b>${esc(g.nm||GN(g))}</b><span class="tag">${st}</span></div><div class="mu">${g.p==='w'?'Semanal':'Mensual'}${g.ty!=='all'?', '+esc(T(g.ty).n):''}</div><div class="bar"><i style="width:${pc}%"></i></div><div style="display:flex;justify-content:space-between"><span>${gf(g,v)} de ${gf(g,g.t)}</span><b>${n(pc,0)}%</b></div><div class="mu">${v>=g.t?'Meta alcanzada':left===0?'Hoy es el último día':left+' días restantes'}</div>${ed?`<div style="margin-top:8px;display:flex;gap:8px"><button class="btn s sm" data-a="gedit" data-id="${g.id}">Editar</button><button class="btn s sm" data-a="gdel" data-id="${g.id}">Eliminar</button></div>`:''}</div>`};
+function calB(){const t=today(),c=UI.cal||(UI.cal={y:+t.slice(0,4),m:+t.slice(5,7)-1});UI.sel=UI.sel||t;const off=(new Date(c.y,c.m,1).getDay()+6)%7,nd=new Date(c.y,c.m+1,0).getDate(),by=new Map(grp(S.acts,ID).map(g=>[g.k,g]));let h=DIAS.map(d=>`<div class="h">${d}</div>`).join('')+'<div class="h" style="grid-column:span '+off+(off?'':';display:none')+'"></div>';
+ for(let d=1;d<=nd;d++){const k=c.y+'-'+String(c.m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0'),g=by.get(k);h+=`<div data-a="day" data-d="${k}" class="${g?'on':''} ${k===UI.sel?'sel':''}">${d}${g?`<small>${g.n} act.</small>${g.dist>0?`<small>${D(g.dist)}</small>`:''}`:''}</div>`}
+ const l=S.acts.filter(x=>x.date===UI.sel);return`<div class="card"><div class="hd" style="margin:0 0 10px"><button class="btn s sm" data-a="cm" data-n="-1">‹</button><b>${MES[c.m]} ${c.y}</b><button class="btn s sm" data-a="cm" data-n="1">›</button></div><div class="cal">${h}</div><h2 style="margin-top:14px">${fd(UI.sel)}</h2>${l.length?l.map(row).join(''):'<p class="mu">Sin actividades este día.</p>'}</div>`}
+
+/* ===== Vistas ===== */
+const V={};
+V.inicio=()=>{const a=S.acts,t=today(),k0=wk(t),tg=sum(a.filter(x=>x.date===t)),cw=sum(a.filter(x=>wk(x.date)===k0)),pw=sum(a.filter(x=>wk(x.date)===addD(k0,-7)));
+ const head=`<div class="hd"><div><h1>Inicio</h1><span class="mu">Hoy, ${fd(t)}</span></div><button class="btn" data-a="go" data-r="registrar">Registrar actividad</button></div>`;
+ const gl=S.goals.length?S.goals.map(g=>gcard(g)).join(''):'<div class="card"><p class="mu">Todavía no definiste objetivos.</p><button class="btn s sm" data-a="go" data-r="objetivos">Crear un objetivo</button></div>';
+ if(!a.length)return head+`<div class="card"><h2>Todavía no hay actividades</h2><p class="mu">Registrá tu primera actividad para ver tu resumen, tus récords y tu progreso.</p><button class="btn" data-a="go" data-r="registrar">Registrar la primera</button></div><h2>Mis objetivos</h2><div class="g g2">${gl}</div>`;
+ const st=(l,v,s='')=>`<div class="card"><div class="mu">${l}</div><div class="big">${v}</div><div class="mu">${s}</div></div>`;
+ const cr=(l,c,p,f)=>`<tr><td>${l}</td><td><b>${f(c)}</b></td><td class="mu">${f(p)}</td><td>${p?(c>=p?'▲ ':'▼ ')+n(Math.abs(c-p)/p*100,0)+'%':'—'}</td></tr>`;
+ const rc=records(a).filter(r=>!r.none).slice(0,4).map(r=>`<div class="row" data-a="go" data-r="records"><div class="grow"><div class="mu">${r.l}</div><b class="ac">${r.fm(r.v)}</b></div><span class="mu">${PL(r.d,r.pk)}</span></div>`).join('');
+ return head+`<div class="g g4">${st('Actividades hoy',tg.n)}${st('Tiempo hoy',tg.dur?H(tg.dur):'0 min')}${st('Distancia hoy',D(tg.dist))}${st('Calorías (est.)',n(tg.cal,0),'solo las que cargaste')}${st('Racha',curStreak(a),'días seguidos')}</div>
+<div class="g g2"><div class="card"><h2>Esta semana y la anterior</h2><table><tr class="mu"><td></td><td>Esta</td><td>Anterior</td><td>Var.</td></tr>${cr('Distancia',cw.dist,pw.dist,D)}${cr('Tiempo',cw.dur,pw.dur,H)}${cr('Actividades',cw.n,pw.n,v=>n(v,0))}${cr('Calorías (est.)',cw.cal,pw.cal,v=>n(v,0))}</table></div>
+<div class="card"><h2>Evolución semanal</h2><div class="tb">${['dist','dur','cal'].map(m=>`<button class="btn ${UI.ch===m?'':'s'} sm" data-a="ch" data-m="${m}">${MT[m][0]}</button>`).join('')}</div>${bars(series(a,'w',8,UI.ch),MT[UI.ch][2])}<div class="mu">Últimas 8 semanas${UI.ch==='dist'?' ('+un().d+')':''}</div></div></div>
+<h2>Mis objetivos</h2><div class="g g2">${gl}</div>
+<div class="g g2"><div class="card"><h2>Últimas actividades</h2>${[...a].sort((x,y)=>y.date.localeCompare(x.date)||(y.ts||0)-(x.ts||0)).slice(0,5).map(row).join('')}</div><div class="card"><h2>Récords destacados</h2>${rc||'<p class="mu">Todavía no hay datos suficientes.</p>'}</div></div>${calB()}`};
+
+V.registrar=()=>{const e=UI.edit&&S.acts.find(x=>x.id===UI.edit),f=un().f,v=e||{type:S.cfg.types[0].id,date:today()};if(UI.edit&&!e)UI.edit=null;
+ const i=(id,l,val='',ex='')=>`<label>${l}<input id="f-${id}" value="${esc(val)}" ${ex}></label>`;
+ return`<div class="hd"><h1>${e?'Editar actividad':'Registrar actividad'}</h1></div><div class="card" id="fa" style="max-width:640px">
+<label>Tipo de actividad<select id="f-type">${S.cfg.types.map(t=>`<option value="${t.id}" ${t.id===v.type?'selected':''}>${t.i} ${esc(t.n)}</option>`).join('')}</select></label>
+<div class="fr">${i('date','Fecha',v.date,'type="date" max="'+today()+'"')}<span></span>${i('start','Hora de inicio (opcional)',v.start||'','type="time"')}${i('end','Hora de finalización (opcional)',v.end||'','type="time"')}
+${i('h','Horas',e?Math.floor(e.dur/60):'','type="number" min="0" inputmode="numeric"')}${i('m','Minutos',e?e.dur%60:'','type="number" min="0" inputmode="numeric"')}</div>
+<div class="fr" data-g="d">${i('dist','Distancia ('+un().d+')',e&&e.dist!=null?+(e.dist*f).toFixed(3):'','type="number" min="0" step="any" inputmode="decimal"')}<span></span>
+<span data-g="pace">${i('pace','Ritmo promedio ('+un().p+')',e&&e.cd&&T(e.type).c!=='bike'?'':'', 'placeholder="se calcula solo"')}</span><span data-g="spd">${i('spd','Velocidad media ('+un().s+')','','type="number" min="0" step="any" placeholder="se calcula solo"')}</span></div>
+<label>Calorías quemadas (estimación, opcional)<input id="f-cal" type="number" min="0" inputmode="numeric" value="${e&&e.cal!=null?e.cal:''}"></label>
+<label data-g="gym">Descripción del entrenamiento<textarea id="f-desc" rows="2">${esc(v.desc||'')}</textarea></label>
+<label>Observaciones (opcional)<textarea id="f-notes" rows="2">${esc(v.notes||'')}</textarea></label>
+<div class="card" id="live" style="background:var(--c2);margin-bottom:14px"></div>
+<div style="display:flex;gap:8px"><button class="btn" data-a="save">${e?'Guardar cambios':'Guardar actividad'}</button><button class="btn s" data-a="go" data-r="${e?'historial':'inicio'}">Cancelar</button></div></div>`};
+
+V.historial=()=>{const h=UI.h;return`<div class="hd"><h1>Mi historial</h1><div><button class="btn ${h.v==='list'?'':'s'} sm" data-a="hv" data-v="list">Lista</button> <button class="btn ${h.v==='cal'?'':'s'} sm" data-a="hv" data-v="cal">Calendario</button></div></div>`+(h.v==='cal'?calB():`<div class="tb"><input data-h="q" placeholder="Buscar…" value="${esc(h.q)}"><select data-h="t"><option value="all">Todos los tipos</option>${S.cfg.types.map(t=>`<option value="${t.id}" ${h.t===t.id?'selected':''}>${esc(t.n)}</option>`).join('')}</select>
+<select data-h="p">${[['all','Todo el historial'],['w','Esta semana'],['m','Este mes'],['y','Este año'],['c','Período personalizado']].map(([k,l])=>`<option value="${k}" ${h.p===k?'selected':''}>${l}</option>`).join('')}</select>
+${h.p==='c'?`<input type="date" data-h="from" value="${h.from}"><input type="date" data-h="to" value="${h.to}">`:''}
+<select data-h="s">${[['d-','Más recientes'],['d+','Más antiguas'],['k-','Mayor distancia'],['t-','Mayor duración'],['c-','Más calorías']].map(([k,l])=>`<option value="${k}" ${h.s===k?'selected':''}>${l}</option>`).join('')}</select></div><div class="card" id="hl">${hl()}</div>`)};
+function hl(){const h=UI.h,t=today();let a=S.acts.filter(x=>(h.t==='all'||x.type===h.t)&&(h.p==='all'||(h.p==='w'&&wk(x.date)===wk(t))||(h.p==='m'&&mo(x.date)===mo(t))||(h.p==='y'&&yr(x.date)===yr(t))||(h.p==='c'&&(!h.from||x.date>=h.from)&&(!h.to||x.date<=h.to))));const q=h.q.trim().toLowerCase();
+ if(q)a=a.filter(x=>[T(x.type).n,x.notes,x.desc,fd(x.date)].join(' ').toLowerCase().includes(q));
+ const k={d:x=>x.date,k:x=>x.dist||0,t:x=>x.dur,c:x=>x.cal||0}[h.s[0]],sg=h.s[1]==='+'?1:-1;a.sort((x,y)=>sg*(k(x)>k(y)?1:k(x)<k(y)?-1:0)||sg*((x.ts||0)-(y.ts||0)));
+ return S.acts.length?(a.length?`<p class="mu">${a.length} actividades</p>`+a.map(row).join(''):'<p class="mu">Ninguna actividad coincide con los filtros.</p>'):'<p class="mu">Todavía no registraste actividades.</p>'}
+
+V.estadisticas=()=>{const s=UI.s,t=today();let b=S.acts.filter(x=>s.t==='all'||x.type===s.t),a=b,ini;
+ if(s.p==='30'||s.p==='90')ini=addD(t,-(+s.p-1));else if(s.p==='year')ini=yr(t)+'-01-01';if(ini)a=b.filter(x=>x.date>=ini);
+ if(!S.acts.length)return'<div class="hd"><h1>Estadísticas</h1></div><div class="card"><p class="mu">Todavía no hay actividades. Registrá algunas para ver tus estadísticas.</p></div>';
+ const tt=sum(a),dd=a.filter(x=>x.dist>0),ds=sum(dd),st=(l,v,x='')=>`<div class="card"><div class="mu">${l}</div><div class="big">${v}</div><div class="mu">${x}</div></div>`;
+ const first=a.length?a.reduce((m,x)=>x.date<m?x.date:m,t):t,from=ini||first,tot=Math.round((parse(t)-parse(from))/864e5)+1,wd=DIAS.map((l,i)=>({l,v:a.filter(x=>(parse(x.date).getDay()+6)%7===i).length}));
+ const ty=S.cfg.types.map(x=>({l:x.i+' '+x.n,v:a.filter(y=>y.type===x.id).length})).filter(x=>x.v>0).sort((x,y)=>y.v-x.v);
+ const ma=s.a||moAdd(mo(t),-1),mb=s.b||mo(t),A=sum(b.filter(x=>mo(x.date)===ma)),B=sum(b.filter(x=>mo(x.date)===mb)),ml=k=>MES[+k.slice(5)-1]+' '+k.slice(0,4);
+ const cr=(l,x,y,f)=>`<tr><td>${l}</td><td>${f(x)}</td><td>${f(y)}</td><td>${x||y?(y-x>=0?'+':'−')+f(Math.abs(y-x)):'—'}</td></tr>`;
+ let best=0,ev=[...b].sort((x,y)=>x.date.localeCompare(y.date)).filter(x=>{const v=MT[s.m][1]({dist:x.dist||0,dur:x.dur,cal:x.cal||0,n:1});if(v>best){best=v;return 1}}).map(x=>({l:fd(x.date),v:MT[s.m][1]({dist:x.dist||0,dur:x.dur,cal:x.cal||0,n:1})}));
+ const sel=(k,o)=>`<select data-st="${k}">${o.map(([v,l])=>`<option value="${v}" ${s[k]===v?'selected':''}>${l}</option>`).join('')}</select>`;
+ return`<div class="hd"><h1>Estadísticas</h1></div><div class="tb">${sel('p',[['all','Todo el historial'],['30','Últimos 30 días'],['90','Últimos 90 días'],['year','Este año']])}<select data-st="t"><option value="all">Todas las actividades</option>${S.cfg.types.map(x=>`<option value="${x.id}" ${s.t===x.id?'selected':''}>${esc(x.n)}</option>`).join('')}</select>${sel('m',[['dist','Distancia'],['dur','Duración'],['cal','Calorías']])}</div>
+<div class="g g4">${st('Distancia total',D(tt.dist))}${st('Tiempo total',H(tt.dur))}${st('Calorías registradas (est.)',n(tt.cal,0))}${st('Actividades',tt.n)}${st('Distancia media',ds.n?D(ds.dist/ds.n):'—','por actividad con distancia')}${st('Duración media',tt.n?H(tt.dur/tt.n):'—','por actividad')}${st('Velocidad media',s.t==='all'?'—':SP(ds.dur?ds.dist/(ds.dur/60):null),s.t==='all'?'elegí un tipo de actividad':'')}${st('Ritmo promedio',s.t==='all'?'—':PC(ds.dist?ds.dur/ds.dist:null),s.t==='all'?'elegí un tipo de actividad':'')}</div>
+<div class="g g2"><div class="card"><h2>Evolución semanal: ${MT[s.m][0]}</h2>${bars(series(b,'w',12,s.m),MT[s.m][2])}</div><div class="card"><h2>Evolución mensual: ${MT[s.m][0]}</h2>${bars(series(b,'m',12,s.m),MT[s.m][2])}</div>
+<div class="card"><h2>Por tipo de actividad</h2>${hbars(ty)}</div><div class="card"><h2>Días de la semana</h2>${bars(wd,v=>n(v,0))}</div>
+<div class="card"><h2>Días activos y sin actividad</h2>${a.length?`<div class="big">${tt.days} <span class="mu" style="font-size:20px">de ${tot} días</span></div><div class="bar"><i style="width:${tt.days/tot*100}%"></i></div><div class="mu">${tot-tt.days} días sin actividad</div>`:NOD}</div>
+<div class="card"><h2>Evolución de mi mejor marca</h2>${line(ev,MT[s.m][2])}<div class="mu">Mejor ${MT[s.m][0].toLowerCase()} en una actividad${s.m==='dist'?' ('+un().d+')':''}</div></div></div>
+<div class="card"><h2>Comparar meses</h2><div class="tb"><input type="month" data-st="a" value="${ma}"><input type="month" data-st="b" value="${mb}"></div>${A.n||B.n?`<table><tr class="mu"><td></td><td>${ml(ma)}</td><td>${ml(mb)}</td><td>Diferencia</td></tr>${cr('Distancia',A.dist,B.dist,D)}${cr('Tiempo',A.dur,B.dur,H)}${cr('Calorías (est.)',A.cal,B.cal,v=>n(v,0))}${cr('Actividades',A.n,B.n,v=>n(v,0))}${cr('Días activos',A.days,B.days,v=>n(v,0))}</table>`:'<p class="mu">No hay actividades en ninguno de los dos meses.</p>'}</div>`};
+
+V.records=()=>{const r=records(S.acts),secs=[...new Set(REC.map(x=>x.sec))];
+ return`<div class="hd"><h1>Mis récords</h1></div>`+(S.acts.length?secs.map(s=>`<h2>${s}</h2><div class="g g4" style="grid-template-columns:repeat(auto-fit,minmax(230px,1fr))">${r.filter(x=>x.sec===s).map(x=>x.none?`<div class="card"><div class="mu">${x.l}</div><div class="big mu">—</div><div class="mu">Aún sin datos suficientes</div></div>`:`<div class="card"><div class="mu">${x.l}</div><div class="big ac">${x.fm(x.v)}</div><div>${PL(x.d,x.pk)}</div><div class="mu">${x.prev?'Marca anterior: '+x.fm(x.prev.v)+' ('+(x.low?'mejoró '+x.fm(x.prev.v-x.v):'+'+x.fm(x.v-x.prev.v))+')':'Primera marca registrada'}</div></div>`).join('')}</div>`).join(''):'<div class="card"><p class="mu">Tus récords aparecerán cuando registres actividades.</p></div>')};
+
+V.objetivos=()=>`<div class="hd"><h1>Mis objetivos</h1><button class="btn" data-a="gnew">Nuevo objetivo</button></div>${S.goals.length?`<div class="g g2">${S.goals.map(g=>gcard(g,1)).join('')}</div>`:'<div class="card"><p class="mu">Todavía no definiste objetivos. Creá uno por distancia, duración, cantidad de actividades, calorías o días activos.</p></div>'}`;
+
+V.logros=()=>{const x=xp(),L=Math.floor(Math.sqrt(x/100))+1,lo=(L-1)**2*100,hi=L*L*100,gl=Object.values(S.ach.g).sort((p,q)=>q.d.localeCompare(p.d));
+ return`<div class="hd"><h1>Logros</h1></div><div class="card" style="margin-bottom:14px"><div class="mu">Nivel</div><div class="big">${L}</div><div class="bar"><i style="width:${(x-lo)/(hi-lo)*100}%"></i></div><div class="mu">${x} XP, faltan ${hi-x} para el nivel ${L+1}. Sumás 10 XP por actividad, 1 por km y 50 por insignia.</div></div>
+<h2>Insignias (${Object.keys(S.ach.b).length} de ${BADGES.length})</h2><div class="g g4" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr))">${BADGES.map(b=>`<div class="card bd ${S.ach.b[b.id]?'':'off'}"><div class="ic">${b.i}</div><b>${b.n}</b><div class="mu">${b.d}</div><div class="mu">${S.ach.b[b.id]?'Conseguida el '+fd(S.ach.b[b.id]):'Pendiente'}</div></div>`).join('')}</div>
+<h2>Objetivos cumplidos</h2><div class="card">${gl.length?gl.map(g=>`<div class="row" style="cursor:default"><span class="ic">🎯</span><div class="grow"><b>${esc(g.nm)}</b><div class="mu">${g.p==='w'?'Semana del '+fd(g.k):PL(g.k,'m')}</div></div><span class="mu">${fd(g.d)}</span></div>`).join(''):'<p class="mu">Todavía no cumpliste ningún objetivo.</p>'}</div>`};
+
+V.config=()=>{const c=S.cfg,df=c.df||{},s=(k,o)=>`<select data-c="${k}">${o.map(([v,l])=>`<option value="${v}" ${c[k]===v?'selected':''}>${l}</option>`).join('')}</select>`,first=S.acts.length?S.acts.reduce((m,x)=>x.date<m?x.date:m,'9999'):null;
+ return`<div class="hd"><h1>Configuración</h1></div><div class="g g2"><div class="card"><h2>Unidades y apariencia</h2><label>Distancia y velocidad${s('unit',[['km','Kilómetros (km, km/h)'],['mi','Millas (mi, mph)']])}</label><label>Tema${s('th',[['dark','Oscuro'],['light','Claro']])}</label><label>Color de acento${s('ac',[['lime','Verde lima'],['sky','Celeste']])}</label></div>
+<div class="card"><h2>Objetivos semanales predeterminados</h2><label>Distancia (${un().d})<input type="number" min="0" data-df="km" value="${df.km||''}"></label><label>Actividades<input type="number" min="0" data-df="n" value="${df.n||''}"></label><label>Horas de actividad<input type="number" min="0" step="any" data-df="h" value="${df.h||''}"></label><button class="btn s" data-a="mkgoals">Crear estos objetivos</button></div>
+<div class="card"><h2>Tipos de actividad</h2>${c.types.map(t=>`<div class="row" style="cursor:default"><span class="ic">${t.i}</span><span class="grow">${esc(t.n)}</span><button class="btn s sm" data-a="tdel" data-id="${t.id}">Quitar</button></div>`).join('')}<div class="fr" style="margin-top:10px"><label>Nombre<input id="t-n"></label><label>Ícono (emoji)<input id="t-i" value="🏅" maxlength="4"></label></div><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="t-d" checked>Registra distancia</label><button class="btn" data-a="tadd">Agregar tipo</button></div>
+<div class="card"><h2>Mis datos</h2><p class="mu">${S.acts.length} actividades registradas${first?'. Primer registro: '+fd(first):''}. Los datos se guardan en este navegador; para cambiar de dispositivo usá la copia de seguridad.</p><div class="tb"><button class="btn s" data-a="csv">Exportar CSV</button><button class="btn s" data-a="json">Copia de seguridad (JSON)</button><button class="btn s" data-a="imp">Restaurar copia</button></div><input type="file" id="imp" accept=".json,application/json" hidden></div></div>`};
+
+/* ===== Formulario: lectura, validación y cálculo ===== */
+const pcParse=s=>{if(!s)return null;const p=s.replace(',','.').split(':');const v=p.length>1?+p[0]+(+p[1])/60:+p[0];return v>0?v:null};
+function parseF(){const g=i=>$('#f-'+i).value.trim(),f=un().f,ty=T(g('type')),num=s=>s===''?null:Number(s.replace(',','.')),date=g('date'),start=g('start'),end=g('end');
+ let dur=(num(g('h'))||0)*60+(num(g('m'))||0),dc=false;
+ if(!dur&&start&&end){let m=(+end.slice(0,2)*60+ +end.slice(3))-(+start.slice(0,2)*60+ +start.slice(3));if(m<=0)m+=1440;dur=m;dc=true}
+ let dist=ty.d?num(g('dist')):null,cal=num(g('cal')),cd=false;if(dist!=null)dist/=f;
+ if(ty.d&&dist==null&&dur>0){const s=num(g('spd')),pc=pcParse(g('pace'));if(s>0){dist=s*dur/60/f;cd=true}else if(pc){dist=dur/pc/f;cd=true}}
+ const er=[];if(!date)er.push('Elegí una fecha.');else if(date>today())er.push('La fecha no puede ser futura.');
+ if(!(dur>0)||dur>1440)er.push('Cargá una duración mayor a 0 y de hasta 24 h (o hora de inicio y fin).');
+ if(dist!=null&&!(dist>=0&&dist<=1000))er.push('La distancia debe estar entre 0 y 1.000 km.');
+ if(cal!=null&&!(cal>=0&&cal<=20000))er.push('Las calorías deben estar entre 0 y 20.000.');
+ return{er,dc,a:{type:ty.id,date,start,end,dur:Math.round(dur),dist:dist!=null?+dist.toFixed(4):null,cal:cal!=null?Math.round(cal):null,desc:ty.c==='gym'?g('desc'):'',notes:g('notes'),cd}}}
+function applyType(){const t=T($('#f-type').value),sh={walk:['pace'],run:['pace','spd'],bike:['spd'],fija:['spd'],otro:['spd'],gym:[]}[t.c]||[];
+ document.querySelectorAll('#fa [data-g]').forEach(e=>{const g=e.dataset.g,on=g==='d'?!!t.d:g==='gym'?t.c==='gym':!!t.d&&sh.includes(g);e.hidden=!on;if(!on&&g!=='d'&&g!=='gym'){const i=e.querySelector('input');i&&(i.value='')}});liveCalc()}
+function liveCalc(){const{a,dc}=parseF(),c=T(a.type).c,l=[];if(dc)l.push('Duración calculada: '+H(a.dur));if(a.cd)l.push('Distancia calculada: '+D(a.dist));
+ if(a.dist>0&&a.dur>0){if(c==='walk'||c==='run')l.push('Ritmo promedio: '+PC(pace(a)));if(c!=='walk')l.push('Velocidad media: '+SP(spd(a)))}else if(T(a.type).d)l.push('Sin distancia no se calculan ritmo ni velocidad.');
+ $('#live').innerHTML=`<b>Valores calculados</b>${l.length?l.map(x=>'<div>'+x+'</div>').join(''):'<div class="mu">Completá duración y distancia para ver los cálculos.</div>'}<div class="mu">Las calorías son estimaciones y se guardan tal como las cargues.</div>`}
+
+/* ===== Acciones ===== */
+const A={
+ go:d=>{if(location.hash==='#'+d.r)render();else location.hash=d.r},
+ day:d=>{UI.sel=d.d;render()},cm:d=>{const c=UI.cal;c.m+=+d.n;if(c.m<0){c.m=11;c.y--}if(c.m>11){c.m=0;c.y++}render()},ch:d=>{UI.ch=d.m;render()},hv:d=>{UI.h.v=d.v;render()},
+ det:d=>{const x=S.acts.find(y=>y.id===d.id);if(!x)return;const t=T(x.type),r=(l,v)=>v?`<tr><td class="mu">${l}</td><td>${v}</td></tr>`:'';
+  modal(`<h2>${t.i} ${esc(t.n)}</h2><table>${r('Fecha',fd(x.date))}${r('Horario',x.start||x.end?(x.start||'?')+' a '+(x.end||'?'):'')}${r('Duración',H(x.dur))}${r('Distancia',x.dist>0?D(x.dist)+(x.cd?' <span class="tag">calculada</span>':''):'')}${r('Ritmo',t.c==='walk'||t.c==='run'?(pace(x)?PC(pace(x))+' <span class="tag">calculado</span>':''):'')}${r('Velocidad media',spd(x)&&t.c!=='walk'?SP(spd(x))+' <span class="tag">calculada</span>':'')}${r('Calorías',x.cal!=null?n(x.cal,0)+' kcal <span class="tag">estimadas</span>':'')}${r('Descripción',esc(x.desc))}${r('Observaciones',esc(x.notes))}</table><div class="tb" style="margin-top:14px"><button class="btn" data-a="edit" data-id="${x.id}">Editar</button><button class="btn d" data-a="del" data-id="${x.id}">Eliminar</button><button class="btn s" data-a="cl">Cerrar</button></div>`)},
+ edit:d=>{UI.edit=d.id;closeModal();if(location.hash==='#registrar')render();else location.hash='registrar'},
+ del:d=>ask('¿Eliminar esta actividad? No se puede deshacer.',async()=>{try{await DB.del(d.id);S.acts=await DB.all();toast('Actividad eliminada.');render()}catch(e){toast('No se pudo eliminar: '+e.message,'err')}}),
+ cl:()=>closeModal(),yes:async()=>{const f=UI.cb;closeModal();f&&await f()},
+ save:async()=>{if(UI.saving)return;const{er,a}=parseF();if(er.length)return toast(er[0],'err');const id=UI.edit||uid();
+  if(S.acts.some(x=>x.id!==id&&x.type===a.type&&x.date===a.date&&x.start===a.start&&x.dur===a.dur&&x.dist===a.dist&&x.cal===a.cal))return toast('Ya existe una actividad idéntica en esa fecha. Si es otra, cambiá algún dato.','err');
+  UI.saving=1;try{const old=S.acts,prev=old.find(x=>x.id===id);await DB.put({...a,id,ts:prev?prev.ts:Date.now()});S.acts=await DB.all();
+   const b4=records(old),af=records(S.acts),nr=af.map((r,i)=>({r,o:b4[i]})).filter(({r,o})=>!r.none&&!o.none&&(r.low?r.v<o.v:r.v>o.v));
+   if(nr.length){S.ach.rec++;nr.slice(0,3).forEach(({r,o})=>toast('🏆 ¡Nuevo récord! '+r.l+': '+r.fm(r.v)+' (antes '+o.fm(o.v)+')','rec'))}
+   (await check([a.date,prev&&prev.date])).forEach(m=>toast(m,'rec'));UI.edit=null;toast('Actividad guardada.');if(location.hash==='#inicio')render();else location.hash='inicio'
+  }catch(e){toast('No se pudo guardar: '+e.message,'err')}finally{UI.saving=0}},
+ gnew:()=>gform(),gedit:d=>gform(S.goals.find(g=>g.id===d.id)),
+ gdel:d=>ask('¿Eliminar este objetivo? Los logros ya conseguidos se conservan.',async()=>{S.goals=S.goals.filter(g=>g.id!==d.id);await saveGoals();render()}),
+ gsave:async d=>{const g=i=>$('#g-'+i).value,m=g('m'),v=Number(g('t').replace(',','.'));if(!(v>0&&v<1e6))return toast('La meta debe ser un número mayor a 0.','err');
+  const o={id:d.id||uid(),nm:g('nm').trim(),m,t:m==='dist'?v/un().f:v,p:g('p'),ty:g('ty'),c:d.id?S.goals.find(x=>x.id===d.id).c:today()};
+  S.goals=d.id?S.goals.map(x=>x.id===d.id?o:x):[...S.goals,o];closeModal();try{await saveGoals();(await check()).forEach(m=>toast(m,'rec'))}catch(e){toast('No se pudo guardar: '+e.message,'err')}render()},
+ mkgoals:async()=>{const df=S.cfg.df||{},l=[['dist',df.km?df.km/un().f:0],['n',+df.n],['dur',+df.h]].filter(x=>x[1]>0);if(!l.length)return toast('Cargá al menos un valor.','err');
+  l.forEach(([m,t])=>{const e=S.goals.find(g=>g.m===m&&g.p==='w'&&g.ty==='all');e?e.t=t:S.goals.push({id:uid(),nm:'',m,t,p:'w',ty:'all',c:today()})});await saveGoals();toast('Objetivos semanales creados.');(await check()).forEach(m=>toast(m,'rec'))},
+ tadd:async()=>{const nm=$('#t-n').value.trim();if(!nm)return toast('Escribí un nombre.','err');if(S.cfg.types.some(t=>t.n.toLowerCase()===nm.toLowerCase()))return toast('Ya existe un tipo con ese nombre.','err');
+  S.cfg.types.push({id:'t-'+uid().slice(0,8),n:nm,i:$('#t-i').value||'🏅',c:'otro',d:$('#t-d').checked?1:0});await saveCfg();render()},
+ tdel:d=>{if(S.acts.some(x=>x.type===d.id))return toast('No se puede quitar: hay actividades de este tipo.','err');if(S.cfg.types.length<2)return toast('Debe quedar al menos un tipo.','err');S.cfg.types=S.cfg.types.filter(t=>t.id!==d.id);saveCfg();render()},
+ csv:()=>{const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"',r=[['fecha','tipo','inicio','fin','duracion_min','distancia_km','calorias_estimadas','ritmo_min_km','velocidad_kmh','descripcion','observaciones']];
+  [...S.acts].sort((x,y)=>x.date.localeCompare(y.date)).forEach(x=>r.push([fd(x.date),T(x.type).n,x.start,x.end,x.dur,x.dist,x.cal,pace(x)?pace(x).toFixed(2):'',spd(x)?spd(x).toFixed(2):'',x.desc,x.notes]));dl('actividades.csv','text/csv','\ufeff'+r.map(l=>l.map(q).join(',')).join('\r\n'))},
+ json:()=>dl('copia-actividad-'+today()+'.json','application/json',JSON.stringify({v:1,acts:S.acts,cfg:S.cfg,goals:S.goals,ach:S.ach})),
+ imp:()=>$('#imp').click()};
+const dl=(n,t,c)=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:t}));a.download=n;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1e3)};
+function gform(g){const m=g?g.m:'dist';modal(`<h2>${g?'Editar':'Nuevo'} objetivo</h2><label>Nombre (opcional)<input id="g-nm" value="${esc(g?g.nm:'')}"></label><label>Qué medir<select id="g-m">${Object.entries(MN).map(([k,l])=>`<option value="${k}" ${k===m?'selected':''}>${l}</option>`).join('')}</select></label>
+ <label>Meta (km o millas según tu unidad; horas para duración)<input id="g-t" type="number" min="0" step="any" value="${g?+(g.m==='dist'?g.t*un().f:g.t).toFixed(2):''}"></label><label>Período<select id="g-p"><option value="w" ${g&&g.p==='w'?'selected':''}>Semanal</option><option value="m" ${g&&g.p==='m'?'selected':''}>Mensual</option></select></label>
+ <label>Actividad<select id="g-ty"><option value="all">Todas</option>${S.cfg.types.map(t=>`<option value="${t.id}" ${g&&g.ty===t.id?'selected':''}>${esc(t.n)}</option>`).join('')}</select></label><div class="tb"><button class="btn" data-a="gsave" data-id="${g?g.id:''}">Guardar</button><button class="btn s" data-a="cl">Cancelar</button></div>`)}
+const modal=h=>{$('#modal').innerHTML='<div class="box">'+h+'</div>';$('#modal').classList.add('on')},closeModal=()=>$('#modal').classList.remove('on');
+const ask=(m,f)=>{UI.cb=f;modal(`<p>${m}</p><div class="tb"><button class="btn d" data-a="yes">Confirmar</button><button class="btn s" data-a="cl">Cancelar</button></div>`)};
+const theme=()=>{document.documentElement.dataset.th=S.cfg.th;document.documentElement.dataset.ac=S.cfg.ac};
+
+/* ===== Navegación y eventos ===== */
+const NAV=[['inicio','Inicio','🏠'],['registrar','Registrar actividad','➕'],['historial','Historial','🗂️'],['estadisticas','Estadísticas','📊'],['records','Récords','🏆'],['objetivos','Objetivos','🎯'],['logros','Logros','🏅'],['config','Configuración','⚙️']];
+function render(){let r=location.hash.slice(1);if(!V[r])r='inicio';if(r!=='registrar')UI.edit=null;
+ $('#nav').innerHTML='<div class="brand">MI REGISTRO</div>'+NAV.map(([k,l,i])=>`<a href="#${k}" class="${k===r?'on':''}"><span>${i}</span>${l}</a>`).join('');
+ $('#main').innerHTML=V[r]();if(r==='registrar')applyType();window.scrollTo(0,0)}
+addEventListener('hashchange',render);
+document.addEventListener('click',e=>{if(e.target.id==='modal')return closeModal();const t=e.target.closest('[data-a]');if(t&&A[t.dataset.a])A[t.dataset.a](t.dataset)});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+document.addEventListener('input',e=>{const t=e.target;
+ if(t.dataset.h){UI.h[t.dataset.h]=t.value;t.dataset.h==='p'?render():$('#hl').innerHTML=hl()}
+ else if(t.dataset.st){UI.s[t.dataset.st]=t.value;render()}
+ else if(t.dataset.c){S.cfg[t.dataset.c]=t.value;saveCfg();theme();render()}
+ else if(t.dataset.df){S.cfg.df[t.dataset.df]=t.value;saveCfg()}
+ else if(t.id==='f-type')applyType();else if(t.closest('#fa'))liveCalc()});
+document.addEventListener('change',async e=>{if(e.target.id!=='imp'||!e.target.files[0])return;const f=e.target.files[0];e.target.value='';
+ try{const o=JSON.parse(await f.text());if(!Array.isArray(o.acts)||!o.acts.every(x=>x&&typeof x.id==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(x.date)&&x.dur>0&&typeof x.type==='string'))throw new Error('el archivo no tiene el formato de una copia válida');
+  ask('Se reemplazarán todos tus datos actuales ('+S.acts.length+' actividades) por los de la copia ('+o.acts.length+'). ¿Continuar?',async()=>{try{const cfg={...S.cfg,...(o.cfg||{})};o.acts.forEach(x=>{if(!cfg.types.some(t=>t.id===x.type))cfg.types.push({id:x.type,n:x.type,i:'❔',c:'otro',d:1})});
+   await DB.clear();for(const x of o.acts)await DB.put(x);S.cfg=cfg;S.goals=o.goals||[];S.ach={b:{},g:{},rec:0,...(o.ach||{})};await saveCfg();await saveGoals();await saveAch();S.acts=await DB.all();theme();toast('Copia restaurada: '+S.acts.length+' actividades.');render()}catch(e){toast('No se pudo restaurar: '+e.message,'err')}})
+ }catch(e){toast('No se pudo leer la copia: '+e.message,'err')}});
+(async()=>{try{await DB.open();S.acts=await DB.all();const c=await DB.get('cfg');if(c)S.cfg={...S.cfg,...c,df:c.df||{}};S.goals=(await DB.get('goals'))||[];S.ach={...S.ach,...((await DB.get('ach'))||{})};theme()}
+ catch(e){$('#main').innerHTML='<div class="card"><h2>No se pueden guardar tus datos</h2><p>Tu navegador bloqueó el almacenamiento local (IndexedDB), por ejemplo en modo privado. Abrí la página en una ventana normal para que tus actividades se conserven.</p></div>';return}
+ render()})();
+</script>
+</body>
+</html>
